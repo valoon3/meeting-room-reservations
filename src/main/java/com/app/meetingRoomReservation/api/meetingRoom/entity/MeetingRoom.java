@@ -1,5 +1,7 @@
 package com.app.meetingRoomReservation.api.meetingRoom.entity;
 
+import com.app.meetingRoomReservation.error.ErrorType;
+import com.app.meetingRoomReservation.error.exceptions.BadRequestException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -31,7 +33,7 @@ public class MeetingRoom {
 
     public static MeetingRoom create(String name, int capacity, int hourlyPrice) {
         if(hourlyPrice % 2 != 0) {
-            // todo: 시간당 금액은 짝수여야 합니다.
+            throw new BadRequestException(ErrorType.INVALID_HOURLY_PRICE);
         }
 
         MeetingRoom meetingRoom = new MeetingRoom();

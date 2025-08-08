@@ -7,6 +7,9 @@ import com.app.meetingRoomReservation.api.reservation.entity.Reservation;
 import com.app.meetingRoomReservation.api.reservation.entity.TimeSlice;
 import com.app.meetingRoomReservation.api.reservation.repository.ReservationCustomRepository;
 import com.app.meetingRoomReservation.api.reservation.repository.ReservationRepository;
+import com.app.meetingRoomReservation.error.ErrorType;
+import com.app.meetingRoomReservation.error.exceptions.BadRequestException;
+import com.app.meetingRoomReservation.error.exceptions.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,9 +31,8 @@ public class ReservationService {
         TimeSlice reservationTimeSlice = TimeSlice.create(request.getStartTime(), request.getEndTime());
         validAlreadyReservationRoom(meetingRoomId, request, reservationTimeSlice);
 
-        // todo: 미팅룸 예외처리
         MeetingRoom meetingRoom = meetingRoomRepository.findById(meetingRoomId)
-                .orElseThrow(() -> new RuntimeException("미팅룸을 찾을 수 없습니다."));
+                .orElseThrow(() -> new EntityNotFoundException(ErrorType.MEETING_ROOM_NOT_FOUND));
         int totalPrice = getTotalPrice(reservationTimeSlice, meetingRoom);
 
         Reservation reservation = Reservation.create(
@@ -46,7 +48,7 @@ public class ReservationService {
         List<Reservation> alreadyReservationMeetingRoom = reservationCustomRepository.getAlreadyReservationMeetingRoom(meetingRoomId, request.getUserId(), reservationTimeSlice);
 
         if(!alreadyReservationMeetingRoom.isEmpty()) {
-            // todo: 이미 예약된 시간에 예약을 시도한 경우 예외 처리
+            throw new BadRequestException(ErrorType.ALREADY_RESERVATION_MEETING_ROOM);
         }
     }
 
