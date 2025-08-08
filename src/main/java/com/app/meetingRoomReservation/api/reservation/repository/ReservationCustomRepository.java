@@ -21,7 +21,7 @@ public class ReservationCustomRepository {
     public List<Reservation> getAlreadyReservationMeetingRoom(Long meetingRoomId, Long userId, TimeSlice timeSlice) {
         BooleanExpression overlapTimeExpression = getOverlapTimeExpression(timeSlice);
         BooleanExpression myReservationExpression = getMyReservationExpression(userId);
-        BooleanExpression othersPaidReservation = getOtherUserPaidReservationExpression(userId);
+        BooleanExpression othersPaidReservation = getOtherUserConfirmReservationExpression(userId);
 
         return queryFactory.selectFrom(reservation)
                 .where(
@@ -32,9 +32,9 @@ public class ReservationCustomRepository {
                 .fetch();
     }
 
-    private BooleanExpression getOtherUserPaidReservationExpression(Long userId) {
+    private BooleanExpression getOtherUserConfirmReservationExpression(Long userId) {
         return reservation.userId.ne(userId)
-                .and(reservation.reservationStatusType.eq(ReservationStatusType.Payed));
+                .and(reservation.reservationStatusType.eq(ReservationStatusType.RESERVATION_CONFIRMATION));
     }
 
     private BooleanExpression getMyReservationExpression(Long userId) {
