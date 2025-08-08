@@ -1,0 +1,58 @@
+package com.app.wiseaiassignment.api.reservation.entity;
+
+import com.app.wiseaiassignment.api.meetingRoom.entity.MeetingRoom;
+import com.app.wiseaiassignment.api.reservation.constant.ReservationStatusType;
+import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Table(
+        name = "reservation",
+        indexes = {
+
+        }
+)
+@Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Reservation {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false)
+    private Long userId;
+
+    @Enumerated(EnumType.STRING)
+    private ReservationStatusType reservationStatusType;
+
+    @Column(nullable = false)
+    private String totalPrice;
+
+    @Embedded
+    private TimeSlice timeSlice;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id", nullable = false)
+    private MeetingRoom meetingRoom;
+
+    private Reservation(Long userId, ReservationStatusType reservationStatusType, String totalPrice, TimeSlice timeSlice, MeetingRoom meetingRoom) {
+        this.userId = userId;
+        this.reservationStatusType = reservationStatusType;
+        this.totalPrice = totalPrice;
+        this.timeSlice = timeSlice;
+        this.meetingRoom = meetingRoom;
+    }
+
+    public static Reservation create(
+            Long userId,
+            ReservationStatusType reservationStatusType,
+            String totalPrice,
+            TimeSlice timeSlice,
+            MeetingRoom meetingRoom
+    ) {
+        return new Reservation(userId, reservationStatusType, totalPrice, timeSlice, meetingRoom);
+    }
+}

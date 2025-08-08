@@ -1,6 +1,6 @@
 package com.app.wiseaiassignment.api.payment.constant;
 
-public enum PaymentType {
+public enum PaymentStatusType {
     PENDING,
     SUCCESS,
     FAILED,
