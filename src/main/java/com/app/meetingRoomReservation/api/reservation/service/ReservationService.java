@@ -2,6 +2,7 @@ package com.app.meetingRoomReservation.api.reservation.service;
 
 import com.app.meetingRoomReservation.api.meetingRoom.entity.MeetingRoom;
 import com.app.meetingRoomReservation.api.meetingRoom.repository.MeetingRoomRepository;
+import com.app.meetingRoomReservation.api.reservation.dto.ConfirmReservationResponse;
 import com.app.meetingRoomReservation.api.reservation.dto.CreateReservationRequest;
 import com.app.meetingRoomReservation.api.reservation.entity.Reservation;
 import com.app.meetingRoomReservation.api.reservation.entity.TimeSlice;
@@ -44,6 +45,20 @@ public class ReservationService {
         return reservationRepository.save(reservation).getId();
     }
 
+    public List<ConfirmReservationResponse> selectConfirmReservations(Long meetingRoomId) {
+        List<Reservation> reservations = reservationCustomRepository.getConfirmReservationMeetingRoom(meetingRoomId);
+
+        return reservations.stream()
+                .map(reservation -> new ConfirmReservationResponse(
+                        reservation.getId(),
+                        reservation.getMeetingRoom().getName(),
+                        reservation.getMeetingRoom().getCapacity(),
+                        reservation.getTimeSlice().getTimeStart(),
+                        reservation.getTimeSlice().getTimeEnd()
+                ))
+                .toList();
+    }
+
     private void validAlreadyReservationRoom(Long meetingRoomId, CreateReservationRequest request, TimeSlice reservationTimeSlice) {
         List<Reservation> alreadyReservationMeetingRoom = reservationCustomRepository.getAlreadyReservationMeetingRoom(meetingRoomId, request.getUserId(), reservationTimeSlice);
 
@@ -55,5 +70,4 @@ public class ReservationService {
     private int getTotalPrice(TimeSlice reservationTimeSlice, MeetingRoom meetingRoom) {
         return reservationTimeSlice.getCalculateDurationUnits() * meetingRoom.getHourlyPrice() / 2;
     }
-
 }

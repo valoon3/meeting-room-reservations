@@ -32,6 +32,16 @@ public class ReservationCustomRepository {
                 .fetch();
     }
 
+    public List<Reservation> getConfirmReservationMeetingRoom(Long meetingRoomId) {
+        return queryFactory.selectFrom(reservation)
+                .join(reservation.meetingRoom).fetchJoin()
+                .where(
+                        reservation.meetingRoom.id.eq(meetingRoomId),
+                        reservation.reservationStatusType.eq(ReservationStatusType.RESERVATION_CONFIRMATION)
+                )
+                .fetch();
+    }
+
     private BooleanExpression getOtherUserConfirmReservationExpression(Long userId) {
         return reservation.userId.ne(userId)
                 .and(reservation.reservationStatusType.eq(ReservationStatusType.RESERVATION_CONFIRMATION));
@@ -45,6 +55,5 @@ public class ReservationCustomRepository {
         return reservation.timeSlice.timeEnd.gt(timeSlice.getTimeStart())
                 .and(reservation.timeSlice.timeStart.lt(timeSlice.getTimeEnd()));
     }
-
 
 }
