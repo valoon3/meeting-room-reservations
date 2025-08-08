@@ -54,7 +54,7 @@ public class Reservation {
     ) {
         return new Reservation(
                 userId,
-                ReservationStatusType.UnPayed,
+                ReservationStatusType.TEMPORARY_RESERVATION,
                 totalPrice,
                 timeSlice,
                 meetingRoom
