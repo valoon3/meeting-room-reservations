@@ -2,6 +2,7 @@ package com.app.wiseaiassignment.api.meetingRoom.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -28,4 +29,16 @@ public class MeetingRoom {
 
     @Column(nullable = false)
     private int hourlyPrice;
+
+    public static MeetingRoom create(String name, int capacity, int hourlyPrice) {
+        if(hourlyPrice % 2 != 0) {
+            // todo: 시간당 금액은 짝수여야 합니다.
+        }
+
+        MeetingRoom meetingRoom = new MeetingRoom();
+        meetingRoom.name = name;
+        meetingRoom.capacity = capacity;
+        meetingRoom.hourlyPrice = hourlyPrice;
+        return meetingRoom;
+    }
 }
