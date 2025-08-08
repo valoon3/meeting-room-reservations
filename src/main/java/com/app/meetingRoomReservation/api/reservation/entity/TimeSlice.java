@@ -1,5 +1,7 @@
 package com.app.meetingRoomReservation.api.reservation.entity;
 
+import com.app.meetingRoomReservation.error.ErrorType;
+import com.app.meetingRoomReservation.error.exceptions.BadRequestException;
 import jakarta.persistence.Embeddable;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -33,11 +35,11 @@ public class TimeSlice {
 
     private void validReservationTime(LocalDateTime start, LocalDateTime end) {
         if (!start.isBefore(end)) {
-            throw new IllegalArgumentException("종료 시간은 시작 시간보다 이후여야 합니다.");
+            throw new BadRequestException(ErrorType.BAD_REQUEST_TIME);
         }
 
         if (start.getMinute() % 30 != 0 || end.getMinute() % 30 != 0) {
-            throw new IllegalArgumentException("예약 시간은 정시 또는 30분 단위로만 가능합니다.");
+            throw new BadRequestException(ErrorType.BAD_TIME_UNIT_REQUEST);
         }
     }
 }
