@@ -10,17 +10,17 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Getter
 public class TimeSlice {
-    private LocalDateTime start;
-    private LocalDateTime end;
+    private LocalDateTime timeStart;
+    private LocalDateTime timeEnd;
 
     public static TimeSlice create(LocalDateTime start, LocalDateTime end) {
         return new TimeSlice(start, end);
     }
 
-    private TimeSlice(LocalDateTime start, LocalDateTime end) {
-        validReservationTime(start, end);
-        this.start = start;
-        this.end = end;
+    private TimeSlice(LocalDateTime timeStart, LocalDateTime timeEnd) {
+        validReservationTime(timeStart, timeEnd);
+        this.timeStart = timeStart;
+        this.timeEnd = timeEnd;
     }
 
     private void validReservationTime(LocalDateTime start, LocalDateTime end) {

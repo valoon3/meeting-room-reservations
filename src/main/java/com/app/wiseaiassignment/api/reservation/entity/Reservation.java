@@ -35,7 +35,7 @@ public class Reservation {
     private TimeSlice timeSlice;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id", nullable = false)
+    @JoinColumn(name = "meeting_room_id", nullable = false)
     private MeetingRoom meetingRoom;
 
     private Reservation(Long userId, ReservationStatusType reservationStatusType, String totalPrice, TimeSlice timeSlice, MeetingRoom meetingRoom) {
