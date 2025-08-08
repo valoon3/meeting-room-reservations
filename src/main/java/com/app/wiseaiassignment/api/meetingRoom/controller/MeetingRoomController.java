@@ -1,5 +1,6 @@
 package com.app.wiseaiassignment.api.meetingRoom.controller;
 
+import com.app.wiseaiassignment.api.meetingRoom.service.MeetingRoomService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +14,8 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/meeting-room")
 public class MeetingRoomController {
+
+    private final MeetingRoomService meetingRoomService;
 
     // 회의실 미팅 조회
     @GetMapping
