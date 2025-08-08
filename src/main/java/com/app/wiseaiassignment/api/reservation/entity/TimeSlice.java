@@ -4,6 +4,7 @@ import jakarta.persistence.Embeddable;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 
 @Embeddable
@@ -15,6 +16,13 @@ public class TimeSlice {
 
     public static TimeSlice create(LocalDateTime start, LocalDateTime end) {
         return new TimeSlice(start, end);
+    }
+
+    // 30분을 하나의 단위로 사용
+    public int getCalculateDurationUnits() {
+        Duration duration = Duration.between(timeStart, timeEnd);
+        long totalMinutes = duration.toMinutes();
+        return (int) (totalMinutes / 30);
     }
 
     private TimeSlice(LocalDateTime timeStart, LocalDateTime timeEnd) {

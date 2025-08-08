@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Table(
         name = "reservation",
         indexes = {
-
+                @Index(name = "idx_reservation_time_start", columnList = "timeStart")
         }
 )
 @Entity
@@ -29,7 +29,7 @@ public class Reservation {
     private ReservationStatusType reservationStatusType;
 
     @Column(nullable = false)
-    private String totalPrice;
+    private int totalPrice;
 
     @Embedded
     private TimeSlice timeSlice;
@@ -38,7 +38,7 @@ public class Reservation {
     @JoinColumn(name = "meeting_room_id", nullable = false)
     private MeetingRoom meetingRoom;
 
-    private Reservation(Long userId, ReservationStatusType reservationStatusType, String totalPrice, TimeSlice timeSlice, MeetingRoom meetingRoom) {
+    private Reservation(Long userId, ReservationStatusType reservationStatusType, int totalPrice, TimeSlice timeSlice, MeetingRoom meetingRoom) {
         this.userId = userId;
         this.reservationStatusType = reservationStatusType;
         this.totalPrice = totalPrice;
@@ -48,11 +48,16 @@ public class Reservation {
 
     public static Reservation create(
             Long userId,
-            ReservationStatusType reservationStatusType,
-            String totalPrice,
+            int totalPrice,
             TimeSlice timeSlice,
             MeetingRoom meetingRoom
     ) {
-        return new Reservation(userId, reservationStatusType, totalPrice, timeSlice, meetingRoom);
+        return new Reservation(
+                userId,
+                ReservationStatusType.UnPayed,
+                totalPrice,
+                timeSlice,
+                meetingRoom
+        );
     }
 }
