@@ -2,6 +2,7 @@ package com.app.meetingRoomReservation.api.reservation.controller;
 
 import com.app.meetingRoomReservation.api.reservation.dto.ConfirmReservationResponse;
 import com.app.meetingRoomReservation.api.reservation.dto.CreateReservationRequest;
+import com.app.meetingRoomReservation.api.reservation.dto.PaymentRequest;
 import com.app.meetingRoomReservation.api.reservation.service.ReservationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -32,16 +33,16 @@ public class ReservationController {
         return ResponseEntity.ok(reservationService.selectConfirmReservations(id));
     }
 
+    @Operation(summary = "예약 결제를 처리합니다.", description = "예약 결제 처리.")
+    @PostMapping("/{id}/payment")
+    public void payment(@PathVariable Long id, @RequestBody PaymentRequest request) {
+        // 결제 생성 로직 구현
+        reservationService.createPayment(id, request);
+    }
+
     @Operation(summary = "예약을 취소합니다.", description = "해당 미팅룸의 확정된 예약을 취소합니다.")
     @DeleteMapping("/meeting-room/{id}")
     public ResponseEntity<Long> deleteReservation(@PathVariable Long id, @RequestParam Long userId) {
-        return ResponseEntity.ok(1L);
-    }
-
-    @Operation(summary = "예약 결제를 처리합니다.", description = "웹훅 결과와 비교 후 예약을 확정처리합니다.")
-    @PostMapping("/{id}/payment")
-    public ResponseEntity<Long> payment(@PathVariable Long id) {
-        // 결제 생성 로직 구현
         return ResponseEntity.ok(1L);
     }
 }
