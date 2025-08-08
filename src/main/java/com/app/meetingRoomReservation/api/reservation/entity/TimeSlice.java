@@ -35,7 +35,7 @@ public class TimeSlice {
 
     private void validReservationTime(LocalDateTime start, LocalDateTime end) {
         if (!start.isBefore(end)) {
-            throw new BadRequestException(ErrorType.BAD_REQUEST_TIME);
+            throw new BadRequestException(ErrorType.INCORRECT_TIME_ORDER_REQUEST);
         }
 
         if (start.getMinute() % 30 != 0 || end.getMinute() % 30 != 0) {
