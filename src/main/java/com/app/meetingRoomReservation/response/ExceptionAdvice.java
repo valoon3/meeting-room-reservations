@@ -2,6 +2,7 @@ package com.app.meetingRoomReservation.response;
 
 import com.app.meetingRoomReservation.error.exceptions.BadRequestException;
 import com.app.meetingRoomReservation.error.exceptions.EntityNotFoundException;
+import com.app.meetingRoomReservation.error.exceptions.ExternalServiceUnavailableException;
 import com.app.meetingRoomReservation.response.model.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +28,14 @@ public class ExceptionAdvice {
         return ResponseEntity
                 .status(404)
                 .body(ErrorResponse.of("EntityNotFoundException", e.getErrorType()));
+    }
+
+    @ExceptionHandler(ExternalServiceUnavailableException.class)
+    public ResponseEntity<ErrorResponse> handleExternalServiceUnavailableException(ExternalServiceUnavailableException e) {
+        log.error("ExternalServiceUnavailableException: {}", e.getErrorType().getErrorMessage(), e);
+        return ResponseEntity
+                .status(503)
+                .body(ErrorResponse.of("ExternalServiceUnavailableException", e.getErrorType()));
     }
 
 }

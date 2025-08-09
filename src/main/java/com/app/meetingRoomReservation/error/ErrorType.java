@@ -24,7 +24,9 @@ public enum ErrorType {
 
     // 결제 관련 에러
     PAYMENT_PRICE_MISMATCH("PE-001", "결제 금액이 일치하지 않습니다."),
+    PAYMENT_NOT_FOUND("PE-002", "존재하지 않는 결제 정보입니다."),
 
+    PAYMENT_PROVIDER_NOT_SUPPORTED("WH-001", "지원하지 않는 결제 제공자입니다."),
 
     ;
 
