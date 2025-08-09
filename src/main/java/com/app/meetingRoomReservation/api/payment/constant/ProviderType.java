@@ -1,9 +1,9 @@
 package com.app.meetingRoomReservation.api.payment.constant;
 
 public enum ProviderType {
-    A_PAY("A-COMPANY"),
-    B_PAY("B-COMPANY"),
-    C_PAY("C-COMPANY")
+    A_PAY("a-pay"),
+    B_PAY("b-pay"),
+    C_PAY("c-pay")
 
     ;
 

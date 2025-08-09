@@ -3,6 +3,7 @@ package com.app.meetingRoomReservation.api.reservation.service;
 import com.app.meetingRoomReservation.api.meetingRoom.entity.MeetingRoom;
 import com.app.meetingRoomReservation.api.meetingRoom.repository.MeetingRoomRepository;
 import com.app.meetingRoomReservation.api.payment.entity.Payment;
+import com.app.meetingRoomReservation.api.payment.gateway.PaymentGatewayFactory;
 import com.app.meetingRoomReservation.api.payment.repository.PaymentRepository;
 import com.app.meetingRoomReservation.api.reservation.dto.ConfirmReservationResponse;
 import com.app.meetingRoomReservation.api.reservation.dto.CreateReservationRequest;
@@ -29,6 +30,7 @@ public class ReservationService {
     private final ReservationCustomRepository reservationCustomRepository;
     private final MeetingRoomRepository meetingRoomRepository;
     private final PaymentRepository paymentRepository;
+    private final PaymentGatewayFactory paymentGatewayFactory;
 
     @Transactional
     public Long createReservation(Long meetingRoomId, CreateReservationRequest request) {
@@ -83,6 +85,7 @@ public class ReservationService {
         Payment payment = Payment.create(request.getProviderType(), request.getPaymentAmount(), reservation);
         paymentRepository.save(payment);
 
-        // todo: webhook mock server 완성 후 작성
+        var gateway = paymentGatewayFactory.getGateway(request.getProviderType());
+        gateway.requestPayment(payment);
     }
 }

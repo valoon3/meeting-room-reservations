@@ -11,7 +11,7 @@ public class PaymentController {
 
     // 결제 상태 조회
     @GetMapping("/{paymentId}/status")
-    public ResponseEntity<Long> get(@PathVariable Long paymentId) {
+    public ResponseEntity<Long> selectPaymentStatus(@PathVariable Long paymentId) {
         return ResponseEntity.ok(1L);
     }
 
