@@ -2,6 +2,9 @@ package com.app.meetingRoomReservation.seeder;
 
 import com.app.meetingRoomReservation.api.meetingRoom.entity.MeetingRoom;
 import com.app.meetingRoomReservation.api.meetingRoom.repository.MeetingRoomRepository;
+import com.app.meetingRoomReservation.api.payment.constant.ProviderType;
+import com.app.meetingRoomReservation.api.paymentProvider.entity.PaymentProvider;
+import com.app.meetingRoomReservation.api.paymentProvider.repository.PaymentProviderRepository;
 import com.app.meetingRoomReservation.api.user.entity.User;
 import com.app.meetingRoomReservation.api.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,11 +20,13 @@ public class TempSeeder implements ApplicationRunner {
 
     private final UserRepository userRepository;
     private final MeetingRoomRepository meetingRoomRepository;
+    private final PaymentProviderRepository paymentProviderRepository;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
         seedUser();
         seedMeetingRoom();
+        seedPaymentProvider();
     }
 
     private void seedUser() {
@@ -39,5 +44,13 @@ public class TempSeeder implements ApplicationRunner {
         MeetingRoom roomD = MeetingRoom.create("roomD", 9, 80000);
 
         meetingRoomRepository.saveAll(List.of(roomA, roomB, roomC, roomD));
+    }
+
+    private void seedPaymentProvider() {
+        PaymentProvider secretA = PaymentProvider.create(ProviderType.A_PAY, "http://localhost:8081/api/v1/mock-payment-api/a-pay", "secretA");
+        PaymentProvider secretB = PaymentProvider.create(ProviderType.A_PAY, "http://localhost:8081/api/v1/mock-payment-api/b-pay", "secretB");
+        PaymentProvider secretC = PaymentProvider.create(ProviderType.A_PAY, "http://localhost:8081/api/v1/mock-payment-api/c-pay", "secretC");
+
+        paymentProviderRepository.saveAll(List.of(secretA, secretB, secretC));
     }
 }

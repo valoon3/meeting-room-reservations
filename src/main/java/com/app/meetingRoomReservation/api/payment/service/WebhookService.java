@@ -7,6 +7,8 @@ import com.app.meetingRoomReservation.api.payment.dto.CWebhookPayload;
 import com.app.meetingRoomReservation.api.payment.dto.PaymentResultDto;
 import com.app.meetingRoomReservation.api.payment.entity.Payment;
 import com.app.meetingRoomReservation.api.payment.repository.PaymentRepository;
+import com.app.meetingRoomReservation.api.paymentProvider.entity.PaymentProvider;
+import com.app.meetingRoomReservation.api.paymentProvider.repository.PaymentProviderRepository;
 import com.app.meetingRoomReservation.error.ErrorType;
 import com.app.meetingRoomReservation.error.exceptions.EntityNotFoundException;
 import com.app.meetingRoomReservation.error.exceptions.ExternalServiceUnavailableException;
@@ -22,6 +24,7 @@ public class WebhookService {
 
     private final PaymentRepository paymentRepository;
     private final ObjectMapper objectMapper;
+    private PaymentProviderRepository paymentProviderRepository;
 
     public void processPaymentWebhook(ProviderType provider, Map<String, Object> payload) {
         PaymentResultDto resultDto;
@@ -50,6 +53,9 @@ public class WebhookService {
     private void updatePaymentAndReservationStatus(PaymentResultDto result) {
         Payment payment = paymentRepository.findById(result.getPaymentId())
                 .orElseThrow(() -> new EntityNotFoundException(ErrorType.PAYMENT_NOT_FOUND));
+
+        PaymentProvider paymentProvider = paymentProviderRepository.findByProviderType(payment.getProviderType())
+                .orElseThrow(() -> new ExternalServiceUnavailableException(ErrorType.PAYMENT_PROVIDER_NOT_SUPPORTED));
 
         // todo: 결제 상태에 따라 예약 상태 업데이트 로직 추가 (paymentResult entity 만든 후 수정)
     }
