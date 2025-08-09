@@ -2,6 +2,7 @@ package com.app.meetingRoomReservation.api.payment.entity;
 
 import com.app.meetingRoomReservation.api.payment.constant.PaymentStatusType;
 import com.app.meetingRoomReservation.api.payment.constant.ProviderType;
+import com.app.meetingRoomReservation.api.paymentProvider.entity.PaymentProvider;
 import com.app.meetingRoomReservation.api.reservation.entity.Reservation;
 import com.app.meetingRoomReservation.error.ErrorType;
 import com.app.meetingRoomReservation.error.exceptions.BadRequestException;
@@ -35,7 +36,11 @@ public class Payment {
     @JoinColumn(name = "reservation_id", nullable = false)
     private Reservation reservation;
 
-    public static Payment create(ProviderType providerType, int totalPrice, Reservation reservation) {
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "payment_provider_id", nullable = false)
+    private PaymentProvider paymentProvider;
+
+    public static Payment create(ProviderType providerType, int totalPrice, Reservation reservation, PaymentProvider paymentProvider) {
         if(totalPrice != reservation.getTotalPrice()) {
             throw new BadRequestException(ErrorType.PAYMENT_PRICE_MISMATCH);
         }
@@ -45,6 +50,19 @@ public class Payment {
         payment.totalPrice = totalPrice;
         payment.paymentStatusType = PaymentStatusType.PENDING;
         payment.reservation = reservation;
+        payment.paymentProvider = paymentProvider;
         return payment;
+    }
+
+    public void updatePaymentStatus(PaymentStatusType paymentStatusType) {
+        this.paymentStatusType = paymentStatusType;
+
+        if (paymentStatusType == PaymentStatusType.SUCCESS) {
+            this.reservation.updateReservationSuccessStatus();
+        } else if (paymentStatusType == PaymentStatusType.FAILED) {
+            // 예약 상태 그대로
+        } else if (paymentStatusType == PaymentStatusType.CANCELLED) {
+            this.reservation.updateReservationCancelledStatus();
+        }
     }
 }

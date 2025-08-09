@@ -21,12 +21,14 @@ public enum ErrorType {
     // 예약 관련 에러
     ALREADY_RESERVATION_MEETING_ROOM("RE-001", "이미 예약된 미팅룸입니다."),
     RESERVATION_NOT_FOUND("RE-002", "존재하지 않는 예약입니다."),
+    RESERVATION_CANCEL_NOT_ALLOWED("RE-003", "예약 상태가 확인되지 않은 상태에서 취소할 수 없습니다."),
 
     // 결제 관련 에러
     PAYMENT_PRICE_MISMATCH("PE-001", "결제 금액이 일치하지 않습니다."),
     PAYMENT_NOT_FOUND("PE-002", "존재하지 않는 결제 정보입니다."),
 
     PAYMENT_PROVIDER_NOT_SUPPORTED("WH-001", "지원하지 않는 결제 제공자입니다."),
+    PAYMENT_AMOUNT_MISMATCH("WH-002", "결제 금액이 일치하지 않습니다."),
 
     ;
 

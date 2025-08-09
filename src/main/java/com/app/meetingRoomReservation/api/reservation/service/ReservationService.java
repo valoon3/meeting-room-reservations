@@ -5,6 +5,8 @@ import com.app.meetingRoomReservation.api.meetingRoom.repository.MeetingRoomRepo
 import com.app.meetingRoomReservation.api.payment.entity.Payment;
 import com.app.meetingRoomReservation.api.payment.gateway.PaymentGatewayFactory;
 import com.app.meetingRoomReservation.api.payment.repository.PaymentRepository;
+import com.app.meetingRoomReservation.api.paymentProvider.entity.PaymentProvider;
+import com.app.meetingRoomReservation.api.paymentProvider.repository.PaymentProviderCustomRepository;
 import com.app.meetingRoomReservation.api.reservation.dto.ConfirmReservationResponse;
 import com.app.meetingRoomReservation.api.reservation.dto.CreateReservationRequest;
 import com.app.meetingRoomReservation.api.reservation.dto.PaymentRequest;
@@ -31,6 +33,7 @@ public class ReservationService {
     private final MeetingRoomRepository meetingRoomRepository;
     private final PaymentRepository paymentRepository;
     private final PaymentGatewayFactory paymentGatewayFactory;
+    private final PaymentProviderCustomRepository paymentProviderCustomRepository;
 
     @Transactional
     public Long createReservation(Long meetingRoomId, CreateReservationRequest request) {
@@ -82,7 +85,9 @@ public class ReservationService {
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new EntityNotFoundException(ErrorType.RESERVATION_NOT_FOUND));
 
-        Payment payment = Payment.create(request.getProviderType(), request.getPaymentAmount(), reservation);
+        PaymentProvider paymentProvider = paymentProviderCustomRepository.findByProviderType(request.getProviderType());
+
+        Payment payment = Payment.create(request.getProviderType(), request.getPaymentAmount(), reservation, paymentProvider);
         paymentRepository.save(payment);
 
         var gateway = paymentGatewayFactory.getGateway(request.getProviderType());

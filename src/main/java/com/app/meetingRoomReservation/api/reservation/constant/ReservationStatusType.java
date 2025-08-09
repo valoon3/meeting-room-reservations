@@ -6,7 +6,8 @@ import lombok.Getter;
 public enum ReservationStatusType {
     TEMPORARY_RESERVATION("임시예약"),
     PAYMENT_PROGRESS("결제진행"),
-    RESERVATION_CONFIRMATION("예약확정")
+    RESERVATION_CONFIRMATION("예약확정"),
+    CANCEL("예약취소")
 
     ;
 
