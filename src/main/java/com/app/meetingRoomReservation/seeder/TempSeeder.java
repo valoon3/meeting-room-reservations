@@ -48,8 +48,8 @@ public class TempSeeder implements ApplicationRunner {
 
     private void seedPaymentProvider() {
         PaymentProvider secretA = PaymentProvider.create(ProviderType.A_PAY, "http://localhost:8081/api/v1/mock-payment-api/a-pay", "secretA");
-        PaymentProvider secretB = PaymentProvider.create(ProviderType.A_PAY, "http://localhost:8081/api/v1/mock-payment-api/b-pay", "secretB");
-        PaymentProvider secretC = PaymentProvider.create(ProviderType.A_PAY, "http://localhost:8081/api/v1/mock-payment-api/c-pay", "secretC");
+        PaymentProvider secretB = PaymentProvider.create(ProviderType.B_PAY, "http://localhost:8081/api/v1/mock-payment-api/b-pay", "secretB");
+        PaymentProvider secretC = PaymentProvider.create(ProviderType.C_PAY, "http://localhost:8081/api/v1/mock-payment-api/c-pay", "secretC");
 
         paymentProviderRepository.saveAll(List.of(secretA, secretB, secretC));
     }

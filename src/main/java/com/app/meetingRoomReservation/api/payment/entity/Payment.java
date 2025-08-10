@@ -32,7 +32,7 @@ public class Payment {
     @Enumerated(EnumType.STRING)
     private PaymentStatusType paymentStatusType;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "reservation_id", nullable = false)
     private Reservation reservation;
 

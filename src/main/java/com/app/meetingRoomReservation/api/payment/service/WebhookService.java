@@ -25,8 +25,8 @@ public class WebhookService {
 
     private final PaymentRepository paymentRepository;
     private final ObjectMapper objectMapper;
-    private PaymentResultRepository paymentResultRepository;
-    private PaymentCustomRepository paymentCustomRepository;
+    private final PaymentResultRepository paymentResultRepository;
+    private final PaymentCustomRepository paymentCustomRepository;
 
     @Transactional
     public void processPaymentWebhook(ProviderType provider, Map<String, Object> payload) {
@@ -39,17 +39,17 @@ public class WebhookService {
         switch (provider) {
             case A_PAY -> {
                 AWebhookPayload aPayload = objectMapper.convertValue(payload, AWebhookPayload.class);
-                Payment payment = findPaymentById(aPayload.getPaymentId());
+                Payment payment = findPaymentById(aPayload.paymentId());
                 paymentResult = createResult(aPayload, payment);
             }
             case B_PAY -> {
                 BWebhookPayload bPayload = objectMapper.convertValue(payload, BWebhookPayload.class);
-                Payment payment = findPaymentById(bPayload.getPaymentId());
+                Payment payment = findPaymentById(bPayload.paymentId());
                 paymentResult = createResult(bPayload, payment);
             }
             case C_PAY -> {
                 CWebhookPayload cPayload = objectMapper.convertValue(payload, CWebhookPayload.class);
-                Payment payment = findPaymentById(cPayload.getPaymentId());
+                Payment payment = findPaymentById(cPayload.paymentId());
                 paymentResult = createResult(cPayload, payment);
             }
             default -> throw new ExternalServiceUnavailableException(ErrorType.PAYMENT_PROVIDER_NOT_SUPPORTED);
@@ -62,9 +62,9 @@ public class WebhookService {
      */
     private PaymentResult createResult(AWebhookPayload payload, Payment payment) {
         APaymentResult result = APaymentResult.create(
-                (int) payload.getTotalPrice(),
-                payload.getAMockInformation1(),
-                payload.getAMockInformation2(),
+                (int) payload.totalPrice(),
+                payload.aMockInformation1(),
+                payload.aMockInformation2(),
                 payment
         );
 
@@ -76,9 +76,9 @@ public class WebhookService {
      */
     private PaymentResult createResult(BWebhookPayload payload, Payment payment) {
         BPaymentResult result = BPaymentResult.create(
-                (int) payload.getTotalPrice(),
-                payload.getBMockInformation1(),
-                payload.getBMockInformation2(),
+                (int) payload.totalPrice(),
+                payload.bMockInformation1(),
+                payload.bMockInformation2(),
                 payment
         );
 
@@ -90,9 +90,9 @@ public class WebhookService {
      */
     private PaymentResult createResult(CWebhookPayload payload, Payment payment) {
         CPaymentResult result = CPaymentResult.create(
-                (int) payload.getTotalPrice(),
-                payload.getCMockInformation1(),
-                payload.getCMockInformation2(),
+                (int) payload.totalPrice(),
+                payload.cMockInformation1(),
+                payload.cMockInformation2(),
                 payment
         );
 
