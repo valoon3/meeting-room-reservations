@@ -7,6 +7,7 @@ import com.app.meetingRoomReservation.api.payment.gateway.PaymentGatewayFactory;
 import com.app.meetingRoomReservation.api.payment.repository.PaymentRepository;
 import com.app.meetingRoomReservation.api.paymentProvider.entity.PaymentProvider;
 import com.app.meetingRoomReservation.api.paymentProvider.repository.PaymentProviderCustomRepository;
+import com.app.meetingRoomReservation.api.reservation.constant.ReservationStatusType;
 import com.app.meetingRoomReservation.api.reservation.dto.ConfirmReservationResponse;
 import com.app.meetingRoomReservation.api.reservation.dto.CreateReservationRequest;
 import com.app.meetingRoomReservation.api.reservation.dto.PaymentRequest;
@@ -39,10 +40,12 @@ public class ReservationService {
     public Long createReservation(Long meetingRoomId, CreateReservationRequest request) {
 
         TimeSlice reservationTimeSlice = TimeSlice.create(request.getStartTime(), request.getEndTime());
+
+        MeetingRoom meetingRoom = meetingRoomRepository.findWithLockById(meetingRoomId)
+                .orElseThrow(() -> new EntityNotFoundException(ErrorType.MEETING_ROOM_NOT_FOUND));
+
         validAlreadyReservationRoom(meetingRoomId, request, reservationTimeSlice);
 
-        MeetingRoom meetingRoom = meetingRoomRepository.findById(meetingRoomId)
-                .orElseThrow(() -> new EntityNotFoundException(ErrorType.MEETING_ROOM_NOT_FOUND));
         int totalPrice = getTotalPrice(reservationTimeSlice, meetingRoom);
 
         Reservation reservation = Reservation.create(
@@ -84,6 +87,10 @@ public class ReservationService {
     public void createPayment(Long reservationId, PaymentRequest request) {
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new EntityNotFoundException(ErrorType.RESERVATION_NOT_FOUND));
+        reservation.updateReservationStatus(ReservationStatusType.PAYMENT_PROGRESS);
+
+        meetingRoomRepository.findWithLockById(reservation.getMeetingRoom().getId())
+                .orElseThrow(() -> new EntityNotFoundException(ErrorType.MEETING_ROOM_NOT_FOUND));
 
         PaymentProvider paymentProvider = paymentProviderCustomRepository.findByProviderType(request.getProviderType());
 

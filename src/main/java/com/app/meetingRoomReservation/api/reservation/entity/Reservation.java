@@ -9,6 +9,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Table(
         name = "reservation",
         indexes = {
@@ -39,6 +41,9 @@ public class Reservation {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "meeting_room_id", nullable = false)
     private MeetingRoom meetingRoom;
+
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     private Reservation(Long userId, ReservationStatusType reservationStatusType, int totalPrice, TimeSlice timeSlice, MeetingRoom meetingRoom) {
         this.userId = userId;

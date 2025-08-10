@@ -8,6 +8,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.app.meetingRoomReservation.api.reservation.entity.QReservation.reservation;
@@ -43,12 +44,24 @@ public class ReservationCustomRepository {
     }
 
     private BooleanExpression getOtherUserConfirmReservationExpression(Long userId) {
+        LocalDateTime fifteenMinutesAgo = LocalDateTime.now().minusMinutes(15);
+
+        BooleanExpression confirmedOrInProgress = reservation.reservationStatusType.in(
+                ReservationStatusType.RESERVATION_CONFIRMATION,
+                ReservationStatusType.PAYMENT_PROGRESS
+        );
+
+        BooleanExpression recentTemporaryReservation = reservation.reservationStatusType.eq(ReservationStatusType.TEMPORARY_RESERVATION)
+                .and(reservation.createdAt.after(fifteenMinutesAgo));
+
         return reservation.userId.ne(userId)
-                .and(reservation.reservationStatusType.eq(ReservationStatusType.RESERVATION_CONFIRMATION));
+                .and(confirmedOrInProgress.or(recentTemporaryReservation));
     }
 
     private BooleanExpression getMyReservationExpression(Long userId) {
-        return reservation.userId.eq(userId);
+        LocalDateTime fifteenMinutesAgo = LocalDateTime.now().minusMinutes(15);
+        return reservation.userId.eq(userId)
+                .and(reservation.createdAt.after(fifteenMinutesAgo));
     }
 
     private BooleanExpression getOverlapTimeExpression(TimeSlice timeSlice) {
