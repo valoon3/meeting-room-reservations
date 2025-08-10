@@ -18,6 +18,10 @@ import com.app.meetingRoomReservation.api.reservation.repository.ReservationRepo
 import com.app.meetingRoomReservation.error.ErrorType;
 import com.app.meetingRoomReservation.error.exceptions.BadRequestException;
 import com.app.meetingRoomReservation.error.exceptions.EntityNotFoundException;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
