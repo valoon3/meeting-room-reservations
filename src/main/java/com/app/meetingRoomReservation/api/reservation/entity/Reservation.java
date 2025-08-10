@@ -63,15 +63,8 @@ public class Reservation {
         );
     }
 
-    public void updateReservationSuccessStatus() {
-        this.reservationStatusType = ReservationStatusType.RESERVATION_CONFIRMATION;
+    public void updateReservationStatus(ReservationStatusType reservationStatusType) {
+        this.reservationStatusType = reservationStatusType;
     }
 
-
-    public void updateReservationCancelledStatus() {
-        if (this.reservationStatusType != ReservationStatusType.RESERVATION_CONFIRMATION) {
-            throw new BadRequestException(ErrorType.RESERVATION_CANCEL_NOT_ALLOWED);
-        }
-        this.reservationStatusType = ReservationStatusType.CANCEL;
-    }
 }

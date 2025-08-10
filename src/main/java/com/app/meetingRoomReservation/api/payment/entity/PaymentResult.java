@@ -3,6 +3,7 @@ package com.app.meetingRoomReservation.api.payment.entity;
 import com.app.meetingRoomReservation.api.payment.constant.PaymentStatusType;
 import com.app.meetingRoomReservation.api.payment.constant.ProviderType;
 import com.app.meetingRoomReservation.api.paymentProvider.entity.PaymentProvider;
+import com.app.meetingRoomReservation.api.reservation.constant.ReservationStatusType;
 import com.app.meetingRoomReservation.error.ErrorType;
 import com.app.meetingRoomReservation.error.exceptions.ExternalServiceUnavailableException;
 import jakarta.persistence.*;
@@ -28,24 +29,36 @@ public abstract class PaymentResult {
     @Column(nullable = false)
     private int totalPrice;
 
+    @Column(nullable = false)
+    private String status;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "payment_id", nullable = false)
     private Payment payment;
 
-    public PaymentResult(int totalPrice, Payment payment) {
+    public PaymentResult(int totalPrice, String status, Payment payment) {
         if(totalPrice != payment.getTotalPrice()) {
             throw new ExternalServiceUnavailableException(ErrorType.PAYMENT_AMOUNT_MISMATCH);
         }
 
         this.totalPrice = totalPrice;
+        this.status = status;
         this.payment = payment;
         this.providerType = payment.getProviderType();
     }
 
     public void updatePaymentStatus() {
-        // todo: webhook 상태에 따라서 업데이트 로직 정의 추가 필요
-        if(payment.getPaymentStatusType().equals(PaymentStatusType.PENDING)) {
+        if(this.status.equals("SUCCESS")) {
             payment.updatePaymentStatus(PaymentStatusType.SUCCESS);
+            payment.getReservation().updateReservationStatus(ReservationStatusType.RESERVATION_CONFIRMATION);
+        }
+        if(this.status.equals("FAILED")) {
+            payment.updatePaymentStatus(PaymentStatusType.FAILED);
+            payment.getReservation().updateReservationStatus(ReservationStatusType.PAYMENT_PROGRESS);
+        }
+        if(this.status.equals("PENDING")) {
+            payment.updatePaymentStatus(PaymentStatusType.PENDING);
+            payment.getReservation().updateReservationStatus(ReservationStatusType.PAYMENT_PROGRESS);
         }
     }
 

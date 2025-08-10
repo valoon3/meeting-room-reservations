@@ -3,6 +3,7 @@ package com.app.meetingRoomReservation.api.payment.entity;
 import com.app.meetingRoomReservation.api.payment.constant.PaymentStatusType;
 import com.app.meetingRoomReservation.api.payment.constant.ProviderType;
 import com.app.meetingRoomReservation.api.paymentProvider.entity.PaymentProvider;
+import com.app.meetingRoomReservation.api.reservation.constant.ReservationStatusType;
 import com.app.meetingRoomReservation.api.reservation.entity.Reservation;
 import com.app.meetingRoomReservation.error.ErrorType;
 import com.app.meetingRoomReservation.error.exceptions.BadRequestException;
@@ -58,11 +59,15 @@ public class Payment {
         this.paymentStatusType = paymentStatusType;
 
         if (paymentStatusType == PaymentStatusType.SUCCESS) {
-            this.reservation.updateReservationSuccessStatus();
-        } else if (paymentStatusType == PaymentStatusType.FAILED) {
+            this.reservation.updateReservationStatus(ReservationStatusType.RESERVATION_CONFIRMATION);
+        }
+
+        if (paymentStatusType == PaymentStatusType.FAILED) {
             // 예약 상태 그대로
-        } else if (paymentStatusType == PaymentStatusType.CANCELLED) {
-            this.reservation.updateReservationCancelledStatus();
+        }
+
+        if (paymentStatusType == PaymentStatusType.CANCELLED) {
+            this.reservation.updateReservationStatus(ReservationStatusType.CANCEL);
         }
     }
 }

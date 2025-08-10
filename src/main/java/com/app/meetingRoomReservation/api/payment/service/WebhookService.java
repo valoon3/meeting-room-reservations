@@ -63,6 +63,7 @@ public class WebhookService {
     private PaymentResult createResult(AWebhookPayload payload, Payment payment) {
         APaymentResult result = APaymentResult.create(
                 (int) payload.totalPrice(),
+                payload.status(),
                 payload.aMockInformation1(),
                 payload.aMockInformation2(),
                 payment
@@ -77,6 +78,7 @@ public class WebhookService {
     private PaymentResult createResult(BWebhookPayload payload, Payment payment) {
         BPaymentResult result = BPaymentResult.create(
                 (int) payload.totalPrice(),
+                payload.status(),
                 payload.bMockInformation1(),
                 payload.bMockInformation2(),
                 payment
@@ -91,6 +93,7 @@ public class WebhookService {
     private PaymentResult createResult(CWebhookPayload payload, Payment payment) {
         CPaymentResult result = CPaymentResult.create(
                 (int) payload.totalPrice(),
+                payload.status(),
                 payload.cMockInformation1(),
                 payload.cMockInformation2(),
                 payment
