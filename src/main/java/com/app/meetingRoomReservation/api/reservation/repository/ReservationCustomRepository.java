@@ -37,8 +37,7 @@ public class ReservationCustomRepository {
         return queryFactory.selectFrom(reservation)
                 .join(reservation.meetingRoom).fetchJoin()
                 .where(
-                        reservation.meetingRoom.id.eq(meetingRoomId),
-                        reservation.reservationStatusType.eq(ReservationStatusType.RESERVATION_CONFIRMATION)
+                        reservation.meetingRoom.id.eq(meetingRoomId)
                 )
                 .fetch();
     }
