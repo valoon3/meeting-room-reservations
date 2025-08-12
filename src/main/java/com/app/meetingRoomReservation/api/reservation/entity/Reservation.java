@@ -2,8 +2,6 @@ package com.app.meetingRoomReservation.api.reservation.entity;
 
 import com.app.meetingRoomReservation.api.meetingRoom.entity.MeetingRoom;
 import com.app.meetingRoomReservation.api.reservation.constant.ReservationStatusType;
-import com.app.meetingRoomReservation.error.ErrorType;
-import com.app.meetingRoomReservation.error.exceptions.BadRequestException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
