@@ -75,18 +75,6 @@ public class ReservationService {
                 .toList();
     }
 
-    private void validAlreadyReservationRoom(Long meetingRoomId, CreateReservationRequest request, TimeSlice reservationTimeSlice) {
-        List<Reservation> alreadyReservationMeetingRoom = reservationCustomRepository.getAlreadyReservationMeetingRoom(meetingRoomId, request.getUserId(), reservationTimeSlice);
-
-        if(!alreadyReservationMeetingRoom.isEmpty()) {
-            throw new BadRequestException(ErrorType.ALREADY_RESERVATION_MEETING_ROOM);
-        }
-    }
-
-    private int getTotalPrice(TimeSlice reservationTimeSlice, MeetingRoom meetingRoom) {
-        return reservationTimeSlice.getCalculateDurationUnits() * meetingRoom.getHourlyPrice() / 2;
-    }
-
     @Transactional
     public void createPayment(Long reservationId, PaymentRequest request) {
         Reservation reservation = reservationRepository.findById(reservationId)
@@ -103,5 +91,17 @@ public class ReservationService {
 
         var gateway = paymentGatewayFactory.getGateway(request.getProviderType());
         gateway.requestPayment(payment);
+    }
+
+    private void validAlreadyReservationRoom(Long meetingRoomId, CreateReservationRequest request, TimeSlice reservationTimeSlice) {
+        List<Reservation> alreadyReservationMeetingRoom = reservationCustomRepository.getAlreadyReservationMeetingRoom(meetingRoomId, request.getUserId(), reservationTimeSlice);
+
+        if(!alreadyReservationMeetingRoom.isEmpty()) {
+            throw new BadRequestException(ErrorType.ALREADY_RESERVATION_MEETING_ROOM);
+        }
+    }
+
+    private int getTotalPrice(TimeSlice reservationTimeSlice, MeetingRoom meetingRoom) {
+        return reservationTimeSlice.getCalculateDurationUnits() * meetingRoom.getHourlyPrice() / 2;
     }
 }
