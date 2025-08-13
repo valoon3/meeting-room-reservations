@@ -63,4 +63,111 @@ class TimeSliceTest {
         assertEquals(ErrorType.BAD_TIME_UNIT_REQUEST, exception2.getErrorType());
     }
 
+    @Test
+    @DisplayName("30분 단위의 다양한 시간 간격에 대해 정확한 단위를 계산한다")
+    void testCalculateDurationUnitsForVariousTimeSpans() {
+        // 30분 = 1 단위
+        TimeSlice thirtyMinutes = TimeSlice.create(
+                LocalDateTime.of(2024, 6, 1, 10, 0),
+                LocalDateTime.of(2024, 6, 1, 10, 30)
+        );
+        assertEquals(1, thirtyMinutes.getCalculateDurationUnits());
+
+        // 1시간 = 2 단위
+        TimeSlice oneHour = TimeSlice.create(
+                LocalDateTime.of(2024, 6, 1, 10, 0),
+                LocalDateTime.of(2024, 6, 1, 11, 0)
+        );
+        assertEquals(2, oneHour.getCalculateDurationUnits());
+
+        // 2시간 = 4 단위
+        TimeSlice twoHours = TimeSlice.create(
+                LocalDateTime.of(2024, 6, 1, 10, 0),
+                LocalDateTime.of(2024, 6, 1, 12, 0)
+        );
+        assertEquals(4, twoHours.getCalculateDurationUnits());
+
+        // 4시간 30분 = 9 단위
+        TimeSlice fourAndHalfHours = TimeSlice.create(
+                LocalDateTime.of(2024, 6, 1, 9, 30),
+                LocalDateTime.of(2024, 6, 1, 14, 0)
+        );
+        assertEquals(9, fourAndHalfHours.getCalculateDurationUnits());
+    }
+
+    @Test
+    @DisplayName("시작 시간과 종료 시간이 같으면 예외가 발생한다")
+    void testCreateTimeSliceWithSameStartAndEndTime() {
+        LocalDateTime sameTime = LocalDateTime.of(2024, 6, 1, 10, 0);
+
+        BadRequestException exception = assertThrows(BadRequestException.class, () -> {
+            TimeSlice.create(sameTime, sameTime);
+        });
+
+        assertEquals(ErrorType.INCORRECT_TIME_ORDER_REQUEST, exception.getErrorType());
+    }
+
+    @Test
+    @DisplayName("자정(00:00)과 정오(30분 단위)에도 정상적으로 동작한다")
+    void testCreateTimeSliceWithMidnightAndNoonTimes() {
+        // 자정부터 30분
+        TimeSlice fromMidnight = TimeSlice.create(
+                LocalDateTime.of(2024, 6, 1, 0, 0),
+                LocalDateTime.of(2024, 6, 1, 0, 30)
+        );
+        assertEquals(1, fromMidnight.getCalculateDurationUnits());
+
+        // 정오부터 1시간 30분
+        TimeSlice fromNoon = TimeSlice.create(
+                LocalDateTime.of(2024, 6, 1, 12, 0),
+                LocalDateTime.of(2024, 6, 1, 13, 30)
+        );
+        assertEquals(3, fromNoon.getCalculateDurationUnits());
+
+        // 23:30부터 다음날 00:30까지 (날짜 경계를 넘나드는 경우)
+        TimeSlice acrossDays = TimeSlice.create(
+                LocalDateTime.of(2024, 6, 1, 23, 30),
+                LocalDateTime.of(2024, 6, 2, 0, 30)
+        );
+        assertEquals(2, acrossDays.getCalculateDurationUnits());
+    }
+
+    @Test
+    @DisplayName("seconds나 nanoseconds가 0이 아닌 경우에도 분 단위 검증이 정상적으로 동작한다")
+    void testCreateTimeSliceWithNonZeroSecondsAndNanoseconds() {
+        // 초와 나노초가 있어도 분이 30분 단위라면 정상 동작
+        TimeSlice validWithSeconds = TimeSlice.create(
+                LocalDateTime.of(2024, 6, 1, 10, 0, 25, 123456789),
+                LocalDateTime.of(2024, 6, 1, 10, 30, 45, 987654321)
+        );
+        assertEquals(1, validWithSeconds.getCalculateDurationUnits());
+
+        // 분이 30분 단위가 아니면 초와 나노초가 있어도 예외 발생
+        BadRequestException exception = assertThrows(BadRequestException.class, () -> {
+            TimeSlice.create(
+                    LocalDateTime.of(2024, 6, 1, 10, 15, 30, 0),
+                    LocalDateTime.of(2024, 6, 1, 11, 0, 0, 0)
+            );
+        });
+        assertEquals(ErrorType.BAD_TIME_UNIT_REQUEST, exception.getErrorType());
+    }
+
+    @Test
+    @DisplayName("매우 긴 시간 간격에 대해서도 정확히 계산한다")
+    void testCalculateDurationUnitsForLongTimeSpan() {
+        // 8시간 = 16 단위
+        TimeSlice eightHours = TimeSlice.create(
+                LocalDateTime.of(2024, 6, 1, 9, 0),
+                LocalDateTime.of(2024, 6, 1, 17, 0)
+        );
+        assertEquals(16, eightHours.getCalculateDurationUnits());
+
+        // 24시간 = 48 단위
+        TimeSlice twentyFourHours = TimeSlice.create(
+                LocalDateTime.of(2024, 6, 1, 0, 0),
+                LocalDateTime.of(2024, 6, 2, 0, 0)
+        );
+        assertEquals(48, twentyFourHours.getCalculateDurationUnits());
+    }
+
 }
