@@ -42,22 +42,17 @@ public class ReservationService {
 
         List<TimeSlice> reservationTimeSlices = TimeSlice.createList(request.getStartTime(), request.getEndTime());
 
-        MeetingRoom meetingRoom = meetingRoomRepository.findById(meetingRoomId)
-                .orElseThrow(() -> new EntityNotFoundException(ErrorType.MEETING_ROOM_NOT_FOUND));
+        MeetingRoom meetingRoom = getMeetingRoomWithValidation(meetingRoomId);
 
-
-        List<Reservation> reservationList = reservationTimeSlices.stream()
-                .map(timeSlice -> Reservation.create(request.getUserId(), timeSlice, meetingRoom))
-                .toList();
+        List<Reservation> reservationList = createReservations(request, reservationTimeSlices, meetingRoom);
         reservationRepository.saveAll(reservationList);
 
-        int totalPrice = getTotalPrice(reservationTimeSlices, meetingRoom);
-        Payment payment = Payment.create(totalPrice, reservationList);
+        Payment payment = createPayment(reservationTimeSlices, meetingRoom, reservationList);
         paymentRepository.save(payment);
-
 
         return reservationList.get(0).getId();
     }
+
 
     public List<ConfirmReservationResponse> selectConfirmReservations(Long meetingRoomId) {
         List<Reservation> reservations = reservationCustomRepository.getConfirmReservationMeetingRoom(meetingRoomId);
@@ -92,7 +87,9 @@ public class ReservationService {
         gateway.requestPayment(payment);
     }
 
+
     // todo: entity 변환 후 삭제
+
     private void validAlreadyReservationRoom(Long meetingRoomId, CreateReservationRequest request, TimeSlice reservationTimeSlice) {
         List<Reservation> alreadyReservationMeetingRoom = reservationCustomRepository.getAlreadyReservationMeetingRoom(meetingRoomId, request.getUserId(), reservationTimeSlice);
 
@@ -100,8 +97,23 @@ public class ReservationService {
             throw new BadRequestException(ErrorType.ALREADY_RESERVATION_MEETING_ROOM);
         }
     }
-
     private int getTotalPrice(List<TimeSlice> reservationTimeSlice, MeetingRoom meetingRoom) {
         return reservationTimeSlice.size() * meetingRoom.getHourlyPrice() / 2;
+    }
+
+    private MeetingRoom getMeetingRoomWithValidation(Long meetingRoomId) {
+        return meetingRoomRepository.findById(meetingRoomId)
+                .orElseThrow(() -> new EntityNotFoundException(ErrorType.MEETING_ROOM_NOT_FOUND));
+    }
+    private List<Reservation> createReservations(CreateReservationRequest request, List<TimeSlice> reservationTimeSlices, MeetingRoom meetingRoom) {
+        return reservationTimeSlices.stream()
+                .map(timeSlice -> Reservation.create(request.getUserId(), timeSlice, meetingRoom))
+                .toList();
+    }
+
+    private Payment createPayment(List<TimeSlice> reservationTimeSlices, MeetingRoom meetingRoom, List<Reservation> reservationList) {
+        int totalPrice = getTotalPrice(reservationTimeSlices, meetingRoom);
+        Payment payment = Payment.create(totalPrice, reservationList);
+        return payment;
     }
 }
