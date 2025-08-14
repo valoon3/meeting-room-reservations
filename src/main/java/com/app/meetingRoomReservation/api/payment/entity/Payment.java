@@ -3,14 +3,14 @@ package com.app.meetingRoomReservation.api.payment.entity;
 import com.app.meetingRoomReservation.api.payment.constant.PaymentStatusType;
 import com.app.meetingRoomReservation.api.payment.constant.ProviderType;
 import com.app.meetingRoomReservation.api.paymentProvider.entity.PaymentProvider;
-import com.app.meetingRoomReservation.api.reservation.constant.ReservationStatusType;
 import com.app.meetingRoomReservation.api.reservation.entity.Reservation;
-import com.app.meetingRoomReservation.error.ErrorType;
-import com.app.meetingRoomReservation.error.exceptions.BadRequestException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Table(
         name = "payment"
@@ -33,41 +33,50 @@ public class Payment {
     @Enumerated(EnumType.STRING)
     private PaymentStatusType paymentStatusType;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "reservation_id", nullable = false)
-    private Reservation reservation;
+    @OneToMany(mappedBy = "payment")
+    private List<Reservation> reservations = new ArrayList<>();
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "payment_provider_id", nullable = false)
     private PaymentProvider paymentProvider;
 
-    public static Payment create(ProviderType providerType, int totalPrice, Reservation reservation, PaymentProvider paymentProvider) {
-        if(totalPrice != reservation.getTotalPrice()) {
-            throw new BadRequestException(ErrorType.PAYMENT_PRICE_MISMATCH);
-        }
+    public void addReservations(List<Reservation> reservations) {
+        reservations.forEach(this::addReservation);
+    }
 
+    public static Payment create(int totalPrice, List<Reservation> reservations) {
         Payment payment = new Payment();
-        payment.providerType = providerType;
         payment.totalPrice = totalPrice;
         payment.paymentStatusType = PaymentStatusType.PENDING;
-        payment.reservation = reservation;
-        payment.paymentProvider = paymentProvider;
+        payment.addReservations(reservations);
+
         return payment;
     }
+
+    // todo: reservation 관계 변경으로 그쪽으로 옮기기
 
     public void updatePaymentStatus(PaymentStatusType paymentStatusType) {
         this.paymentStatusType = paymentStatusType;
 
-        if (paymentStatusType == PaymentStatusType.SUCCESS) {
-            this.reservation.updateReservationStatus(ReservationStatusType.RESERVATION_CONFIRMATION);
-        }
+//        if (paymentStatusType == PaymentStatusType.SUCCESS) {
+//            this.reservation.updateReservationStatus(ReservationStatusType.RESERVATION_CONFIRMATION);
+//        }
+//
+//        if (paymentStatusType == PaymentStatusType.FAILED) {
+//            // 예약 상태 그대로
+//        }
+//
+//        if (paymentStatusType == PaymentStatusType.CANCELLED) {
+//            this.reservation.updateReservationStatus(ReservationStatusType.CANCEL);
+//        }
+    }
+    private void addReservation(Reservation reservation) {
+        this.reservations.add(reservation);
+        reservation.updatePayment(this);
+    }
 
-        if (paymentStatusType == PaymentStatusType.FAILED) {
-            // 예약 상태 그대로
-        }
-
-        if (paymentStatusType == PaymentStatusType.CANCELLED) {
-            this.reservation.updateReservationStatus(ReservationStatusType.CANCEL);
-        }
+    public void updatePaymentProvider(PaymentProvider paymentProvider) {
+        this.paymentProvider = paymentProvider;
+        this.providerType = paymentProvider.getProviderType();
     }
 }

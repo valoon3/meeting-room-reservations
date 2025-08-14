@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Lock;
 import java.util.Optional;
 
 public interface MeetingRoomRepository extends JpaRepository<MeetingRoom, Long> {
+    // todo: entity 변환 후 삭제
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     Optional<MeetingRoom> findWithLockById(Long id);
 }

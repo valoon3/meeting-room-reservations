@@ -4,8 +4,6 @@ import com.app.meetingRoomReservation.api.reservation.dto.ConfirmReservationResp
 import com.app.meetingRoomReservation.api.reservation.dto.CreateReservationRequest;
 import com.app.meetingRoomReservation.api.reservation.dto.PaymentRequest;
 import com.app.meetingRoomReservation.api.reservation.service.ReservationService;
-import com.app.meetingRoomReservation.error.exceptions.BadRequestException;
-import com.app.meetingRoomReservation.error.exceptions.EntityNotFoundException;
 import com.app.meetingRoomReservation.response.model.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -52,7 +50,7 @@ public class ReservationController {
     @PostMapping("/{id}/payment")
     public void payment(@PathVariable Long id, @RequestBody PaymentRequest request) {
         // 결제 생성 로직 구현
-        reservationService.createPayment(id, request);
+        reservationService.processPayment(id, request);
     }
 
     @Operation(summary = "예약을 취소합니다.", description = "해당 미팅룸의 확정된 예약을 취소합니다.")

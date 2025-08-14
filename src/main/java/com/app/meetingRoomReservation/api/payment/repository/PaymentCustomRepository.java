@@ -18,7 +18,8 @@ public class PaymentCustomRepository {
     public Payment findByIdWithReservation(Long paymentId) {
         Payment payment1 = queryFactory
                 .selectFrom(payment)
-                .leftJoin(payment.reservation).fetchJoin()
+                // todo: query 수정
+//                .leftJoin(payment.reservation).fetchJoin()
                 .where(payment.id.eq(paymentId))
                 .fetchOne();
 

@@ -16,7 +16,6 @@ import com.app.meetingRoomReservation.api.reservation.entity.Reservation;
 import com.app.meetingRoomReservation.api.reservation.repository.ReservationCustomRepository;
 import com.app.meetingRoomReservation.api.reservation.repository.ReservationRepository;
 import com.app.meetingRoomReservation.error.exceptions.BadRequestException;
-import com.app.meetingRoomReservation.error.exceptions.EntityNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,7 +25,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -89,7 +87,7 @@ class ReservationServiceTest {
 
     @Test
     @DisplayName("결제 생성 - 성공")
-    void createPayment_Success() {
+    void processPayment_Success() {
         // given
         Long reservationId = 1L;
         int expectedPrice = 10000;
@@ -101,7 +99,7 @@ class ReservationServiceTest {
         PaymentGateway mockGateway = mock(PaymentGateway.class);
 
         when(reservationRepository.findById(reservationId)).thenReturn(Optional.of(mockReservation));
-        when(mockReservation.getTotalPrice()).thenReturn(expectedPrice);
+//        when(mockReservation.getTotalPrice()).thenReturn(expectedPrice);
         when(mockReservation.getMeetingRoom()).thenReturn(mockMeetingRoom);
         when(mockMeetingRoom.getId()).thenReturn(1L);
         when(meetingRoomRepository.findWithLockById(1L)).thenReturn(Optional.of(mockMeetingRoom));
@@ -109,7 +107,7 @@ class ReservationServiceTest {
         when(paymentGatewayFactory.getGateway(request.getProviderType())).thenReturn(mockGateway);
 
         // when
-        reservationService.createPayment(reservationId, request);
+        reservationService.processPayment(reservationId, request);
 
         // then
         verify(mockReservation, times(1)).updateReservationStatus(ReservationStatusType.PAYMENT_PROGRESS);

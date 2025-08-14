@@ -1,6 +1,8 @@
 package com.app.meetingRoomReservation.api.reservation.repository;
 
+import com.app.meetingRoomReservation.api.payment.entity.QPayment;
 import com.app.meetingRoomReservation.api.reservation.constant.ReservationStatusType;
+import com.app.meetingRoomReservation.api.reservation.entity.QReservation;
 import com.app.meetingRoomReservation.api.reservation.entity.Reservation;
 import com.app.meetingRoomReservation.api.reservation.entity.TimeSlice;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static com.app.meetingRoomReservation.api.payment.entity.QPayment.payment;
 import static com.app.meetingRoomReservation.api.reservation.entity.QReservation.reservation;
 
 @Repository
@@ -41,6 +44,22 @@ public class ReservationCustomRepository {
                 )
                 .fetch();
     }
+
+
+    public List<Reservation> getReservationWithPayment(Long reservationId) {
+        return queryFactory.selectFrom(reservation)
+                .join(reservation.payment, payment).fetchJoin()
+                .where(
+                        reservation.payment.id.in(
+                                queryFactory.select(reservation.payment.id)
+                                        .from(reservation)
+                                        .where(reservation.id.eq(reservationId))
+                        )
+                )
+                .fetch();
+
+    }
+
 
     private BooleanExpression getOtherUserConfirmReservationExpression(Long userId) {
         LocalDateTime fifteenMinutesAgo = LocalDateTime.now().minusMinutes(15);

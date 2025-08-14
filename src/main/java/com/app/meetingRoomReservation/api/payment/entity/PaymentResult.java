@@ -50,15 +50,18 @@ public abstract class PaymentResult {
     public void updatePaymentStatus() {
         if(this.status.equals("SUCCESS")) {
             payment.updatePaymentStatus(PaymentStatusType.SUCCESS);
-            payment.getReservation().updateReservationStatus(ReservationStatusType.RESERVATION_CONFIRMATION);
+            // todo: query 수정
+//            payment.getReservation().updateReservationStatus(ReservationStatusType.RESERVATION_CONFIRMATION);
         }
         if(this.status.equals("FAILED")) {
             payment.updatePaymentStatus(PaymentStatusType.FAILED);
-            payment.getReservation().updateReservationStatus(ReservationStatusType.PAYMENT_PROGRESS);
+            // todo: query 수정
+//            payment.getReservation().updateReservationStatus(ReservationStatusType.PAYMENT_PROGRESS);
         }
         if(this.status.equals("PENDING")) {
             payment.updatePaymentStatus(PaymentStatusType.PENDING);
-            payment.getReservation().updateReservationStatus(ReservationStatusType.PAYMENT_PROGRESS);
+            // todo : query 수정
+//            payment.getReservation().updateReservationStatus(ReservationStatusType.PAYMENT_PROGRESS);
         }
     }
 
