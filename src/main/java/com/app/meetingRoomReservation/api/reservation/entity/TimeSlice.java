@@ -1,7 +1,9 @@
 package com.app.meetingRoomReservation.api.reservation.entity;
 
+
 import com.app.meetingRoomReservation.error.ErrorType;
 import com.app.meetingRoomReservation.error.exceptions.BadRequestException;
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,11 +13,14 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
 @Embeddable
 @NoArgsConstructor
-@Getter
 public class TimeSlice {
+    @Column(name = "time_start")
     private LocalDateTime timeStart;
+    
+    @Column(name = "time_end") 
     private LocalDateTime timeEnd;
 
     // 30분 단위 TimeSlice 리스트를 생성하는 정적 메서드

@@ -13,10 +13,10 @@ import java.time.LocalDateTime;
 @Table(
         name = "reservation",
         indexes = {
-                @Index(name = "idx_reservation_time_start", columnList = "timeStart")
+                @Index(name = "idx_reservation_time_start", columnList = "time_start")
         },
         uniqueConstraints = {
-                @UniqueConstraint(name = "uc_reservation_meeting_room_time", columnNames = {"meeting_room", "timeSlice_timeStart", "timeSlice_timeEnd"})
+                @UniqueConstraint(name = "uc_reservation_meeting_room_time", columnNames = {"meeting_room_id", "time_start", "time_end"})
         }
 )
 @Entity

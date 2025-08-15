@@ -97,6 +97,7 @@ public class ReservationService {
             throw new BadRequestException(ErrorType.ALREADY_RESERVATION_MEETING_ROOM);
         }
     }
+
     private int getTotalPrice(List<TimeSlice> reservationTimeSlice, MeetingRoom meetingRoom) {
         return reservationTimeSlice.size() * meetingRoom.getHourlyPrice() / 2;
     }
@@ -105,6 +106,7 @@ public class ReservationService {
         return meetingRoomRepository.findById(meetingRoomId)
                 .orElseThrow(() -> new EntityNotFoundException(ErrorType.MEETING_ROOM_NOT_FOUND));
     }
+
     private List<Reservation> createReservations(CreateReservationRequest request, List<TimeSlice> reservationTimeSlices, MeetingRoom meetingRoom) {
         return reservationTimeSlices.stream()
                 .map(timeSlice -> Reservation.create(request.getUserId(), timeSlice, meetingRoom))
