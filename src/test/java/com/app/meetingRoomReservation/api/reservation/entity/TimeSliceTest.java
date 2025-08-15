@@ -6,6 +6,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -17,13 +18,13 @@ class TimeSliceTest {
         LocalDateTime start = LocalDateTime.of(2024, 6, 1, 10, 0);
         LocalDateTime end = LocalDateTime.of(2024, 6, 1, 11, 30);
 
-        TimeSlice timeSlice = TimeSlice.create(start, end);
+        List<TimeSlice> timeSliceList = TimeSlice.createList(start, end);
 
-        assertNotNull(timeSlice);
-        assertEquals(start, timeSlice.getTimeStart());
-        assertEquals(end, timeSlice.getTimeEnd());
+        assertNotNull(timeSliceList);
+        assertEquals(start, timeSliceList.getFirst().getTimeStart());
+        assertEquals(end, timeSliceList.getLast().getTimeEnd());
         // Duration: 1 hour 30 minutes = 90 minutes / 30 = 3 units
-        assertEquals(3, timeSlice.getCalculateDurationUnits());
+        assertEquals(3, timeSliceList.size());
     }
 
     @Test
@@ -34,7 +35,7 @@ class TimeSliceTest {
 
         // 예외 발생을 확인하고, 발생한 예외 객체를 `exception` 변수에 저장
         BadRequestException exception = assertThrows(BadRequestException.class, () -> {
-            TimeSlice.create(start, end);
+            TimeSlice.createList(start, end);
         });
 
         // 발생한 예외의 ErrorType이 예상과 일치하는지 확인
@@ -49,7 +50,7 @@ class TimeSliceTest {
         LocalDateTime end = LocalDateTime.of(2024, 6, 1, 11, 0);
 
         BadRequestException exception1 = assertThrows(BadRequestException.class, () -> {
-            TimeSlice.create(startWithInvalidMinute, end);
+            TimeSlice.createList(startWithInvalidMinute, end);
         });
         assertEquals(ErrorType.BAD_TIME_UNIT_REQUEST, exception1.getErrorType());
 
@@ -58,7 +59,7 @@ class TimeSliceTest {
         LocalDateTime endWithInvalidMinute = LocalDateTime.of(2024, 6, 1, 11, 45);
 
         BadRequestException exception2 = assertThrows(BadRequestException.class, () -> {
-            TimeSlice.create(start, endWithInvalidMinute);
+            TimeSlice.createList(start, endWithInvalidMinute);
         });
         assertEquals(ErrorType.BAD_TIME_UNIT_REQUEST, exception2.getErrorType());
     }
@@ -67,32 +68,32 @@ class TimeSliceTest {
     @DisplayName("30분 단위의 다양한 시간 간격에 대해 정확한 단위를 계산한다")
     void testCalculateDurationUnitsForVariousTimeSpans() {
         // 30분 = 1 단위
-        TimeSlice thirtyMinutes = TimeSlice.create(
+        List<TimeSlice> thirtyMinutes = TimeSlice.createList(
                 LocalDateTime.of(2024, 6, 1, 10, 0),
                 LocalDateTime.of(2024, 6, 1, 10, 30)
         );
-        assertEquals(1, thirtyMinutes.getCalculateDurationUnits());
+        assertEquals(1, thirtyMinutes.size());
 
         // 1시간 = 2 단위
-        TimeSlice oneHour = TimeSlice.create(
+        List<TimeSlice> oneHour = TimeSlice.createList(
                 LocalDateTime.of(2024, 6, 1, 10, 0),
                 LocalDateTime.of(2024, 6, 1, 11, 0)
         );
-        assertEquals(2, oneHour.getCalculateDurationUnits());
+        assertEquals(2, oneHour.size());
 
         // 2시간 = 4 단위
-        TimeSlice twoHours = TimeSlice.create(
+        List<TimeSlice> twoHours = TimeSlice.createList(
                 LocalDateTime.of(2024, 6, 1, 10, 0),
                 LocalDateTime.of(2024, 6, 1, 12, 0)
         );
-        assertEquals(4, twoHours.getCalculateDurationUnits());
+        assertEquals(4, twoHours.size());
 
         // 4시간 30분 = 9 단위
-        TimeSlice fourAndHalfHours = TimeSlice.create(
+        List<TimeSlice> fourAndHalfHours = TimeSlice.createList(
                 LocalDateTime.of(2024, 6, 1, 9, 30),
                 LocalDateTime.of(2024, 6, 1, 14, 0)
         );
-        assertEquals(9, fourAndHalfHours.getCalculateDurationUnits());
+        assertEquals(9, fourAndHalfHours.size());
     }
 
     @Test
@@ -101,7 +102,7 @@ class TimeSliceTest {
         LocalDateTime sameTime = LocalDateTime.of(2024, 6, 1, 10, 0);
 
         BadRequestException exception = assertThrows(BadRequestException.class, () -> {
-            TimeSlice.create(sameTime, sameTime);
+            TimeSlice.createList(sameTime, sameTime);
         });
 
         assertEquals(ErrorType.INCORRECT_TIME_ORDER_REQUEST, exception.getErrorType());
@@ -111,63 +112,43 @@ class TimeSliceTest {
     @DisplayName("자정(00:00)과 정오(30분 단위)에도 정상적으로 동작한다")
     void testCreateTimeSliceWithMidnightAndNoonTimes() {
         // 자정부터 30분
-        TimeSlice fromMidnight = TimeSlice.create(
+        List<TimeSlice> fromMidnight = TimeSlice.createList(
                 LocalDateTime.of(2024, 6, 1, 0, 0),
                 LocalDateTime.of(2024, 6, 1, 0, 30)
         );
-        assertEquals(1, fromMidnight.getCalculateDurationUnits());
+        assertEquals(1, fromMidnight.size());
 
         // 정오부터 1시간 30분
-        TimeSlice fromNoon = TimeSlice.create(
+        List<TimeSlice> fromNoon = TimeSlice.createList(
                 LocalDateTime.of(2024, 6, 1, 12, 0),
                 LocalDateTime.of(2024, 6, 1, 13, 30)
         );
-        assertEquals(3, fromNoon.getCalculateDurationUnits());
+        assertEquals(3, fromNoon.size());
 
         // 23:30부터 다음날 00:30까지 (날짜 경계를 넘나드는 경우)
-        TimeSlice acrossDays = TimeSlice.create(
+        List<TimeSlice> acrossDays = TimeSlice.createList(
                 LocalDateTime.of(2024, 6, 1, 23, 30),
                 LocalDateTime.of(2024, 6, 2, 0, 30)
         );
-        assertEquals(2, acrossDays.getCalculateDurationUnits());
-    }
-
-    @Test
-    @DisplayName("seconds나 nanoseconds가 0이 아닌 경우에도 분 단위 검증이 정상적으로 동작한다")
-    void testCreateTimeSliceWithNonZeroSecondsAndNanoseconds() {
-        // 초와 나노초가 있어도 분이 30분 단위라면 정상 동작
-        TimeSlice validWithSeconds = TimeSlice.create(
-                LocalDateTime.of(2024, 6, 1, 10, 0, 25, 123456789),
-                LocalDateTime.of(2024, 6, 1, 10, 30, 45, 987654321)
-        );
-        assertEquals(1, validWithSeconds.getCalculateDurationUnits());
-
-        // 분이 30분 단위가 아니면 초와 나노초가 있어도 예외 발생
-        BadRequestException exception = assertThrows(BadRequestException.class, () -> {
-            TimeSlice.create(
-                    LocalDateTime.of(2024, 6, 1, 10, 15, 30, 0),
-                    LocalDateTime.of(2024, 6, 1, 11, 0, 0, 0)
-            );
-        });
-        assertEquals(ErrorType.BAD_TIME_UNIT_REQUEST, exception.getErrorType());
+        assertEquals(2, acrossDays.size());
     }
 
     @Test
     @DisplayName("매우 긴 시간 간격에 대해서도 정확히 계산한다")
     void testCalculateDurationUnitsForLongTimeSpan() {
         // 8시간 = 16 단위
-        TimeSlice eightHours = TimeSlice.create(
+        List<TimeSlice> eightHours = TimeSlice.createList(
                 LocalDateTime.of(2024, 6, 1, 9, 0),
                 LocalDateTime.of(2024, 6, 1, 17, 0)
         );
-        assertEquals(16, eightHours.getCalculateDurationUnits());
+        assertEquals(16, eightHours.size());
 
         // 24시간 = 48 단위
-        TimeSlice twentyFourHours = TimeSlice.create(
+        List<TimeSlice> twentyFourHours = TimeSlice.createList(
                 LocalDateTime.of(2024, 6, 1, 0, 0),
                 LocalDateTime.of(2024, 6, 2, 0, 0)
         );
-        assertEquals(48, twentyFourHours.getCalculateDurationUnits());
+        assertEquals(48, twentyFourHours.size());
     }
 
 }

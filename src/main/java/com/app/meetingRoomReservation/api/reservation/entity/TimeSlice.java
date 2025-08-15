@@ -37,13 +37,6 @@ public class TimeSlice {
         return timeSlices;
     }
 
-    // 30분을 하나의 단위로 사용
-    public int getCalculateDurationUnits() {
-        Duration duration = Duration.between(timeStart, timeEnd);
-        long totalMinutes = duration.toMinutes();
-        return (int) (totalMinutes / 30);
-    }
-
     private TimeSlice(LocalDateTime timeStart, LocalDateTime timeEnd) {
         this.timeStart = timeStart;
         this.timeEnd = timeEnd;
