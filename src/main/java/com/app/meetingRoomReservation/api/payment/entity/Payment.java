@@ -37,7 +37,7 @@ public class Payment {
     private List<Reservation> reservations = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "payment_provider_id", nullable = false)
+    @JoinColumn(name = "payment_provider_id")
     private PaymentProvider paymentProvider;
 
     public void addReservations(List<Reservation> reservations) {
